@@ -4,11 +4,11 @@ import numpy as np
 import pandas as pd
 
 # Parameters
-data_path = r"D:\new\preprocessed_dataset"  # Path to your dataset folder
-train_dir = r"D:\new\train_dataset"  # Path to save training images
-test_dir = r"D:\new\test_dataset"  # Path to save testing images
-train_excel_path = r"D:\new\train_labels.xlsx"  # Path to save the train Excel file
-test_excel_path = r"D:\new\test_labels.xlsx"  # Path to save the test Excel file
+data_path = r"C:\Users\moksh\projects\image forensics\image-forensics\preprocessed datasets"  # Path to your dataset folder
+train_dir = r"C:\Users\moksh\projects\image forensics\image-forensics\train_dataset"  # Path to save training images
+test_dir = r"C:\Users\moksh\projects\image forensics\image-forensics\test_dataset"  # Path to save testing images
+train_excel_path = r"C:\Users\moksh\projects\image forensics\image-forensics\train_labels.xlsx"  # Path to save the train Excel file
+test_excel_path = r"C:\Users\moksh\projects\image forensics\image-forensics\test_labels.xlsx"  # Path to save the test Excel file
 test_size = 0.2  # Proportion of the dataset to use for testing
 
 # Create directories for train and test sets

@@ -36,7 +36,7 @@ for idx, file in enumerate(os.listdir(original_images_dir)):
 df = pd.DataFrame(image_data, columns=['image_path', 'class'])
 
 # Save the DataFrame to an Excel file
-excel_file_path = r"D:\DL\image_labels.xlsx"
+excel_file_path = r"C:\Users\moksh\projects\image forensics\image-forensics\image_labels.xlsx"
 df.to_excel(excel_file_path, index=False)
 
 # Output message indicating successful completion
