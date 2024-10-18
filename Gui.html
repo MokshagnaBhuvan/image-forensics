@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adversarial Image Finder</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Poppins:wght@600&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* Base Styling */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #1a1b27;
+            /* Tokyo Night dark background */
+            color: #dcdfe4;
+            /* Light gray text for better readability */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #202746;
+            /* Dark blue-gray container */
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.7);
+            padding: 40px;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        h2 {
+            font-family: 'Roboto', sans-serif;
+            color: #dcdfe4;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .header {
+            color: #7aa2f7;
+            /* Tokyo Night accent blue */
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        /* Custom file input */
+        .file-input-container {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input {
+            display: none;
+            /* Hide the default file input */
+        }
+
+        .file-label {
+            display: block;
+            padding: 10px;
+            background-color: #2d314d;
+            /* Darker background for file input */
+            border: 1px solid #3e4a64;
+            /* Subtle border */
+            border-radius: 5px;
+            font-size: 16px;
+            font-family: 'Poppins', sans-serif;
+            color: #dcdfe4;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .file-label:hover {
+            background-color: #3e4a64;
+            /* Lighter background on hover */
+        }
+
+        input[type="file"]:focus+.file-label {
+            border-color: #7aa2f7;
+            /* Highlight border on focus */
+        }
+
+        /* Styling for the Upload button */
+        button {
+            background-color: #9ece6a;
+            /* Tokyo Night green */
+            color: #1a1b27;
+            /* Dark text for contrast */
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+            /* Add space between file input and upload button */
+        }
+
+        button:hover {
+            background-color: #7aa2f7;
+            /* Lighter green on hover */
+        }
+
+        #uploading {
+            display: none;
+            margin-top: 20px;
+            color: #f7768e;
+            /* Pinkish color for processing */
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: 500;
+            color: #9ece6a;
+            /* Green for "Not Adversarial" */
+        }
+
+        .result.is-adversarial {
+            color: #f7768e;
+            /* Pinkish red for "Adversarial" */
+        }
+
+        .result span {
+            font-weight: bold;
+        }
+
+        .error {
+            color: #f7768e;
+            /* Red for error messages */
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">Adversarial Image Finder</div>
+        <h2>Upload Image for AI Processing</h2>
+        <form id="image-form">
+            <div class="file-input-container">
+                <input type="file" id="image-input" class="file-input" accept="image/*" />
+                <label for="image-input" class="file-label">Choose Image File</label>
+            </div>
+            <button type="submit">Upload</button>
+        </form>
+
+        <div id="uploading">
+            <p>Processing your image...</p>
+        </div>
+
+        <div class="result" id="result"></div>
+        <div class="error" id="error-message"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById("image-form");
+        const imageInput = document.getElementById("image-input");
+        const uploading = document.getElementById("uploading");
+        const resultDiv = document.getElementById("result");
+        const errorMessage = document.getElementById("error-message");
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const file = imageInput.files[0];
+            if (!file) {
+                errorMessage.textContent = "Please select an image file.";
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("image", file);
+
+            uploading.style.display = "block"; // Show the processing message
+            resultDiv.textContent = ""; // Clear previous result
+            errorMessage.textContent = ""; // Clear error message
+
+            try {
+                const response = await fetch("/predict", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    if (data.is_adversarial) {
+                        resultDiv.innerHTML = `This image is <span>Adversarial</span> with <span>${data.confidence.toFixed(2)}%</span> confidence.`;
+                        resultDiv.classList.add('is-adversarial');
+                    } else {
+                        resultDiv.innerHTML = `This image is <span>Not Adversarial</span>.`;
+                        resultDiv.classList.remove('is-adversarial');
+                    }
+                } else {
+                    throw new Error(data.error || "Unknown error occurred");
+                }
+            } catch (error) {
+                errorMessage.textContent = `Error: ${error.message}`;
+            } finally {
+                uploading.style.display = "none"; // Hide the processing message
+            }
+        });
+    </script>
+</body>
+
+</html>

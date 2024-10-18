@@ -4,11 +4,12 @@ import cv2
 import pandas as pd
 import tensorflow as tf
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, precision_score, recall_score, f1_score
+import matplotlib.pyplot as plt
 
 # Parameters
-original_test_data_path = r"D:\new\test_dataset"  # Path to your original test dataset folder
-adversarial_test_data_path = r"D:\new\adversarial_test"  # Path to your adversarial test dataset folder
-adversarial_labels_excel_path = r"D:\new\adversarial_labels.xlsx"  # Path to labels Excel file for adversarial images
+original_test_data_path = r"C:\Users\moksh\projects\image forensics\image-forensics\test_dataset"  # Path to your original test dataset folder
+adversarial_test_data_path = r"C:\Users\moksh\projects\image forensics\image-forensics\adversarial_test" # Path to your adversarial test dataset folder
+adversarial_labels_excel_path = r"C:\Users\moksh\projects\image forensics\image-forensics\adversarial_labels(test).xlsx"  # Path to labels Excel file for adversarial images
 
 # Load and preprocess images from a folder
 def load_images_from_folder(folder):
@@ -27,7 +28,7 @@ original_test_images = load_images_from_folder(original_test_data_path)
 adversarial_test_images = load_images_from_folder(adversarial_test_data_path)
 
 # Load adversarial labels
-adversarial_df = pd.read_excel(adversarial_labels_excel_path)
+adversarial_df = pd.read_excel(adversarial_labels_excel_path,engine="openpyxl")
 adversarial_labels = adversarial_df['class'].values  # Assuming the class column contains 1s for adversarial images
 
 # Combine test datasets
@@ -35,7 +36,7 @@ combined_test_images = np.concatenate((original_test_images, adversarial_test_im
 combined_labels = np.concatenate((np.zeros(len(original_test_images)), np.ones(len(adversarial_test_images))), axis=0)  # 0 for original, 1 for adversarial
 
 # Load the trained autoencoder model
-model = tf.keras.models.load_model("D:\new\autoencoder_model_robust.h5")
+model = tf.keras.models.load_model(r"C:\Users\moksh\projects\image forensics\image-forensics\autoencoder_model_robust.h5")
 
 # Use the autoencoder to reconstruct the test images
 reconstructed_images = model.predict(combined_test_images)
