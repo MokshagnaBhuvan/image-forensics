@@ -3,7 +3,7 @@ import numpy as np
 import cv2
 import pandas as pd
 import tensorflow as tf
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, precision_score, recall_score, f1_score
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, precision_score, recall_score, f1_score, roc_auc_score
 import matplotlib.pyplot as plt
 
 # Parameters
@@ -28,7 +28,7 @@ original_test_images = load_images_from_folder(original_test_data_path)
 adversarial_test_images = load_images_from_folder(adversarial_test_data_path)
 
 # Load adversarial labels
-adversarial_df = pd.read_excel(adversarial_labels_excel_path,engine="openpyxl")
+adversarial_df = pd.read_excel(adversarial_labels_excel_path, engine="openpyxl")
 adversarial_labels = adversarial_df['class'].values  # Assuming the class column contains 1s for adversarial images
 
 # Combine test datasets
@@ -36,7 +36,7 @@ combined_test_images = np.concatenate((original_test_images, adversarial_test_im
 combined_labels = np.concatenate((np.zeros(len(original_test_images)), np.ones(len(adversarial_test_images))), axis=0)  # 0 for original, 1 for adversarial
 
 # Load the trained autoencoder model
-model = tf.keras.models.load_model(r"C:\Users\moksh\projects\image forensics\image-forensics\autoencoder_model_robust.h5")
+model = tf.keras.models.load_model(r"C:\Users\moksh\projects\image forensics\image-forensics\autoencoder_model_robust2.h5")
 
 # Use the autoencoder to reconstruct the test images
 reconstructed_images = model.predict(combined_test_images)
@@ -64,6 +64,15 @@ precision = precision_score(combined_labels, predictions)
 recall = recall_score(combined_labels, predictions)
 f1 = f1_score(combined_labels, predictions)
 
+# Calculate AUC (Area Under the Curve)
+# To calculate AUC, we need the predicted probabilities, not just the hard predictions.
+# Autoencoders typically return reconstruction errors (MSE). For the sake of AUC, we can use these MSE values as a continuous probability score.
+# You could normalize the MSE scores to use as the prediction probability.
+# If using MSE, lower MSE indicates higher likelihood that the image is original.
+
+# Calculate AUC (treating lower MSE as higher "original" confidence)
+auc = roc_auc_score(combined_labels, 1 - (mse_loss / mse_loss.max()))  # Normalize MSE to [0, 1]
+
 # Print results
 print(f"Total Images: {total_images}")
 print(f"Correct Predictions: {correct_predictions}")
@@ -71,6 +80,7 @@ print(f"Model Accuracy: {accuracy:.2f}%")
 print(f"Precision: {precision:.2f}")
 print(f"Recall: {recall:.2f}")
 print(f"F1 Score: {f1:.2f}")
+print(f"AUC: {auc:.2f}")
 
 # Generate and display confusion matrix
 cm = confusion_matrix(combined_labels, predictions, labels=[0, 1])  # 0 = Original, 1 = Adversarial
