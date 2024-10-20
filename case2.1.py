@@ -7,13 +7,13 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 # Load the trained Autoencoder model
-model = tf.keras.models.load_model(r"D:\new\autoencoder_model.h5")
+model = tf.keras.models.load_model(r"C:\Users\moksh\projects\image forensics\image-forensics\autoencoder_model_full.h5")
 
 # Directory for adversarial images
-adversarial_dir = r"D:\new\adversarial_test"
+adversarial_dir = r"C:\Users\moksh\projects\image forensics\image-forensics\adversarial_test"
 
 # Load adversarial image paths from Excel file
-adversarial_labels_excel_path = r"D:\new\adversarial_labels.xlsx"
+adversarial_labels_excel_path = r"C:\Users\moksh\projects\image forensics\image-forensics\adversarial_labels(test).xlsx"
 adversarial_df = pd.read_excel(adversarial_labels_excel_path)
 
 # Function to load and preprocess images
