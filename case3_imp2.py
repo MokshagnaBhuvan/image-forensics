@@ -11,7 +11,7 @@ import pandas as pd
 # Parameters
 image_size = (128, 128)  # Image size for resizing
 batch_size = 32  # Batch size for training
-epochs = 50  # Number of epochs for training
+epochs = 100  # Number of epochs for training
 original_data_path = r"C:\Users\moksh\projects\image forensics\image-forensics\train_dataset"  # Path to your original dataset folder
 adversarial_data_path = r"C:\Users\moksh\projects\image forensics\image-forensics\adversarial_train"  # Path to your adversarial dataset folder
 
